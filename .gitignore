@@ -1,0 +1,20 @@
+
+# Compiled binaries (The actual apps)
+*.cgi
+*.exe
+*.o
+
+# Libraries and Drivers (Users should download these themselves)
+*.dll
+*.lib
+*.a
+
+# Folders created by the compiler or IDE
+.vscode/
+.antigravity/
+build/
+
+# Local server or database configs
+httpd.conf
+php.ini
+*.log

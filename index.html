@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassPoints | Smart Student Points Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Main App -->
+    <div class="app">
+        <div class="glass-card">
+
+            <!-- Brand -->
+            <div class="brand">
+                <div class="logo">ClassPoints</div>
+                <div class="tagline">Smart Student Points Tracker</div>
+            </div>
+
+            <!-- VIEW: Role Selection -->
+            <div class="view active" id="viewRoleSelect">
+                <p class="section-subtitle" style="text-align:center;">Select your role to continue</p>
+                <div class="role-cards">
+                    <div class="role-card teacher" onclick="selectRole('teacher')">
+                        <span class="icon">🎓</span>
+                        <span class="label">Teacher</span>
+                        <span class="sublabel">Manage points</span>
+                    </div>
+                    <div class="role-card student" onclick="selectRole('student')">
+                        <span class="icon">📘</span>
+                        <span class="label">Student</span>
+                        <span class="sublabel">View points</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Teacher Name Entry -->
+            <div class="view" id="viewTeacherName">
+                <button class="back-btn" onclick="showView('viewRoleSelect')">← Back</button>
+                <h2 class="section-title">Teacher Portal</h2>
+                <p class="section-subtitle">Enter your name to access the system</p>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="teacherName" placeholder="e.g. Mr. Sharma" autofocus>
+                </div>
+                <button class="btn btn-green" id="btnCheckAccess" onclick="checkTeacherAccess()">
+                    Check Access →
+                </button>
+            </div>
+
+            <!-- VIEW: Set Password (First Time) -->
+            <div class="view" id="viewSetPassword">
+                <button class="back-btn" onclick="showView('viewTeacherName')">← Back</button>
+                <h2 class="section-title">Welcome! 🎉</h2>
+                <p class="section-subtitle" id="setPassMsg">Set a password for your account</p>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Choose a strong password">
+                </div>
+                <button class="btn btn-green" id="btnSetPass" onclick="setPassword()">
+                    Set Password →
+                </button>
+            </div>
+
+            <!-- VIEW: Enter Password (Returning) -->
+            <div class="view" id="viewEnterPassword">
+                <button class="back-btn" onclick="showView('viewTeacherName')">← Back</button>
+                <h2 class="section-title" id="welcomeBackTitle">Welcome Back!</h2>
+                <p class="section-subtitle">Enter your password to continue</p>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" id="btnLogin" onclick="verifyPassword()">
+                    Login →
+                </button>
+            </div>
+
+            <!-- VIEW: Teacher Dashboard -->
+            <div class="view" id="viewDashboard">
+                <div class="dashboard-header">
+                    <div class="welcome">WELCOME BACK</div>
+                    <div class="user-name" id="dashboardName"></div>
+                </div>
+                <div class="dashboard-actions">
+                    <div class="action-card" onclick="showAskQuestion()">
+                        <div class="action-icon">❓</div>
+                        <div>
+                            <div class="action-text">Ask a Question</div>
+                            <div class="action-desc">Quiz students and award points</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="showEditPoints()">
+                        <div class="action-icon">✏️</div>
+                        <div>
+                            <div class="action-text">Edit Points</div>
+                            <div class="action-desc">Adjust student scores manually</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="loadHistory()">
+                        <div class="action-icon">📊</div>
+                        <div>
+                            <div class="action-text">View History</div>
+                            <div class="action-desc">See all points you've awarded</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="loadLeaderboard()">
+                        <div class="action-icon">🏆</div>
+                        <div>
+                            <div class="action-text">View Leaderboard</div>
+                            <div class="action-desc">See top performing students</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+            </div>
+
+            <!-- VIEW: Points History -->
+            <div class="view" id="viewHistory">
+                <button class="back-btn" onclick="showView('viewDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">Points History</h2>
+                <p class="section-subtitle">All points you've awarded</p>
+                <div id="historyTable"></div>
+            </div>
+
+            <!-- VIEW: Leaderboard -->
+            <div class="view" id="viewLeaderboard">
+                <button class="back-btn" onclick="showView('viewDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title" style="color:#FFD700;">🏆 Class Leaderboard</h2>
+                <p class="section-subtitle">Top 5 students with the most points</p>
+                <div id="leaderboardTable" style="margin-top:20px;"></div>
+            </div>
+
+            <!-- VIEW: Student Portal (ID Entry) -->
+            <div class="view" id="viewStudent">
+                <button class="back-btn" onclick="showView('viewRoleSelect')">← Back</button>
+                <h2 class="section-title">Student Portal</h2>
+                <p class="section-subtitle">Enter your Student ID to continue</p>
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" id="studentId" placeholder="e.g. 101">
+                </div>
+                <button class="btn btn-primary" id="btnCheckStudentAccess" onclick="checkStudentAccess()">
+                    Continue →
+                </button>
+            </div>
+
+            <!-- VIEW: Student Set Password (First Time) -->
+            <div class="view" id="viewStudentSetPassword">
+                <button class="back-btn" onclick="showView('viewStudent')">← Back</button>
+                <h2 class="section-title">Welcome! 🎉</h2>
+                <p class="section-subtitle" id="studentSetPassMsg">Set a password for your account</p>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="studentNewPassword" placeholder="Choose a strong password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="studentConfirmPassword" placeholder="Confirm your password">
+                </div>
+                <button class="btn btn-green" id="btnStudentSetPass" onclick="setStudentPassword()">
+                    Set Password →
+                </button>
+            </div>
+
+            <!-- VIEW: Student Enter Password (Returning) -->
+            <div class="view" id="viewStudentEnterPassword">
+                <button class="back-btn" onclick="showView('viewStudent')">← Back</button>
+                <h2 class="section-title" id="studentWelcomeBackTitle">Welcome Back!</h2>
+                <p class="section-subtitle">Enter your password to continue</p>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="studentLoginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" id="btnStudentLogin" onclick="verifyStudentPassword()">
+                    Login →
+                </button>
+            </div>
+
+            <!-- VIEW: Student Dashboard -->
+            <div class="view" id="viewStudentDashboard">
+                <div class="dashboard-header">
+                    <div class="welcome">WELCOME</div>
+                    <div class="user-name" id="studentDashboardName"></div>
+                </div>
+                <div class="student-info-card">
+                    <div class="student-info-label">Student ID</div>
+                    <div class="student-info-value" id="studentDashboardId"></div>
+                </div>
+                <div class="dashboard-actions" style="margin-top:1.25rem;">
+                    <div class="action-card" onclick="loadStudentSummary()">
+                        <div class="action-icon">📊</div>
+                        <div>
+                            <div class="action-text">Points Summary</div>
+                            <div class="action-desc">View your total score and recent activity</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="loadStudentHistory()">
+                        <div class="action-icon">📋</div>
+                        <div>
+                            <div class="action-text">Full History</div>
+                            <div class="action-desc">See all points you've received</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="loadStudentLeaderboard()">
+                        <div class="action-icon">🏆</div>
+                        <div>
+                            <div class="action-text">Leaderboard</div>
+                            <div class="action-desc">See where you rank among peers</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                    <div class="action-card" onclick="showView('viewChangePassword')">
+                        <div class="action-icon">🔒</div>
+                        <div>
+                            <div class="action-text">Change Password</div>
+                            <div class="action-desc">Update your account password</div>
+                        </div>
+                        <span class="arrow">→</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="studentLogout()">🚪 Logout</button>
+            </div>
+
+            <!-- VIEW: Student Points Summary -->
+            <div class="view" id="viewStudentSummary">
+                <button class="back-btn" onclick="showView('viewStudentDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">📊 Points Summary</h2>
+                <p class="section-subtitle" id="summaryStudentInfo"></p>
+                <div id="summaryContent"></div>
+            </div>
+
+            <!-- VIEW: Student Full History -->
+            <div class="view" id="viewStudentHistory">
+                <button class="back-btn" onclick="showView('viewStudentDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">📋 Full Points History</h2>
+                <p class="section-subtitle">All points you have received</p>
+                <div id="studentHistoryTable"></div>
+            </div>
+
+            <!-- VIEW: Student Leaderboard -->
+            <div class="view" id="viewStudentLeaderboard">
+                <button class="back-btn" onclick="showView('viewStudentDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title" style="color:#FFD700;">🏆 Class Leaderboard</h2>
+                <p class="section-subtitle">See where you stand among your classmates</p>
+                <div id="studentLeaderboardTable" style="margin-top:20px;"></div>
+            </div>
+
+            <!-- VIEW: Change Password -->
+            <div class="view" id="viewChangePassword">
+                <button class="back-btn" onclick="showView('viewStudentDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">🔒 Change Password</h2>
+                <p class="section-subtitle">Enter your current password and choose a new one</p>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="changeNewPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="changeConfirmPassword" placeholder="Confirm new password">
+                </div>
+                <button class="btn btn-green" id="btnChangePassword" onclick="changePassword()">
+                    🔐 Update Password
+                </button>
+            </div>
+
+            <!-- VIEW: Search Student (Ask a Question flow) -->
+            <div class="view" id="viewSearchStudent">
+                <button class="back-btn" onclick="showView('viewDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">Ask a Question</h2>
+                <p class="section-subtitle">Search for a student to award points</p>
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="searchStudentName" placeholder="e.g. Rahul Kumar">
+                </div>
+                <button class="btn btn-primary" id="btnSearchStudent" onclick="searchStudent()">
+                    Find Student →
+                </button>
+            </div>
+
+            <!-- VIEW: Select Student (multiple matches) -->
+            <div class="view" id="viewSelectStudent">
+                <button class="back-btn" onclick="showView('viewSearchStudent')">← Back</button>
+                <h2 class="section-title">Multiple Students Found</h2>
+                <p class="section-subtitle">Select the correct student</p>
+                <div class="dashboard-actions" id="studentList"></div>
+            </div>
+
+            <!-- VIEW: Assign Marks -->
+            <div class="view" id="viewAssignMarks">
+                <button class="back-btn" onclick="showView('viewSearchStudent')">← Back</button>
+                <h2 class="section-title">Assign Points</h2>
+                <p class="section-subtitle" id="assignMarksInfo"></p>
+                <input type="hidden" id="selectedStudentId">
+                <div class="form-group">
+                    <label>Question / Topic</label>
+                    <input type="text" id="questionDesc" placeholder="e.g. C Pointers Quiz">
+                </div>
+                <div class="form-group">
+                    <label>Max Marks</label>
+                    <input type="number" id="maxMarks" placeholder="e.g. 10">
+                </div>
+                <div class="form-group">
+                    <label>Awarded Marks</label>
+                    <input type="number" id="awardedMarks" placeholder="e.g. 8">
+                </div>
+                <button class="btn btn-green" id="btnSavePoints" onclick="savePoints()">
+                    💾 Save Points
+                </button>
+            </div>
+
+            <!-- VIEW: Search for Edit -->
+            <div class="view" id="viewEditSearch">
+                <button class="back-btn" onclick="showView('viewDashboard')">← Back to Dashboard</button>
+                <h2 class="section-title">Edit Student Points</h2>
+                <p class="section-subtitle">Search for a student to view and adjust their points</p>
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="editSearchName" placeholder="e.g. Rahul Kumar">
+                </div>
+                <button class="btn btn-primary" id="btnEditSearch" onclick="searchStudentForEdit()">
+                    Find Student →
+                </button>
+            </div>
+
+            <!-- VIEW: Select Student for Edit (duplicates) -->
+            <div class="view" id="viewSelectStudentEdit">
+                <button class="back-btn" onclick="showView('viewEditSearch')">← Back</button>
+                <h2 class="section-title">Multiple Students Found</h2>
+                <p class="section-subtitle">Select the correct student</p>
+                <div class="dashboard-actions" id="editStudentList"></div>
+            </div>
+
+            <!-- VIEW: Edit Profile -->
+            <div class="view" id="viewEditProfile">
+                <button class="back-btn" onclick="showView('viewEditSearch')">← Back</button>
+                <h2 class="section-title">Edit Profile</h2>
+                <p class="section-subtitle" id="editProfileInfo"></p>
+                <input type="hidden" id="editStudentId">
+                <div id="editHistoryTable"></div>
+                <h3 style="margin-top:1.5rem;font-size:1rem;margin-bottom:0.75rem;">Adjust Points</h3>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <input type="text" id="adjustReason" placeholder="e.g. Correction in Quiz 1">
+                </div>
+                <div class="form-group">
+                    <label>Points (+/-)</label>
+                    <input type="number" id="adjustValue" placeholder="e.g. 5 or -5">
+                </div>
+                <button class="btn btn-green" id="btnApplyAdjust" onclick="applyAdjustment()">
+                    ✅ Apply Adjustment
+                </button>
+                
+                <h3 style="margin-top:2rem;font-size:1rem;margin-bottom:0.75rem;color:var(--accent-red);">Danger Zone</h3>
+                <button class="btn btn-primary" id="btnResetPoints" onclick="resetStudentPoints()" style="background:var(--accent-red);box-shadow:0 6px 20px rgba(255, 75, 75, 0.3);">
+                    ⚠️ Reset All Points for Student
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API = '/cgi-bin/login.cgi';
+        let currentTeacher = '';
+        let currentStudentId = '';
+        let currentStudentName = '';
+
+        // ==================== VIEW MANAGEMENT ====================
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const view = document.getElementById(viewId);
+            view.classList.remove('active');
+            // Force reflow for animation replay
+            void view.offsetWidth;
+            view.classList.add('active');
+        }
+
+        function selectRole(role) {
+            if (role === 'teacher') {
+                showView('viewTeacherName');
+                setTimeout(() => document.getElementById('teacherName').focus(), 100);
+            } else {
+                showView('viewStudent');
+                setTimeout(() => document.getElementById('studentId').focus(), 100);
+            }
+        }
+
+        // ==================== API CALLS ====================
+        async function apiCall(params) {
+            try {
+                const query = new URLSearchParams(params).toString();
+                const res = await fetch(`${API}?${query}`);
+                const data = await res.json();
+                return data;
+            } catch (e) {
+                return { status: 'error', message: 'Could not connect to server' };
+            }
+        }
+
+        // ==================== TEACHER FLOW ====================
+        async function checkTeacherAccess() {
+            const name = document.getElementById('teacherName').value.trim();
+            if (!name) { toast('Please enter your name', 'error'); return; }
+
+            const btn = document.getElementById('btnCheckAccess');
+            setLoading(btn, true);
+
+            const data = await apiCall({ role: 'teacher', name: name });
+            setLoading(btn, false);
+
+            if (data.status === 'error') {
+                toast(data.message, 'error');
+                return;
+            }
+
+            currentTeacher = name;
+
+            if (data.action === 'set_password') {
+                document.getElementById('setPassMsg').textContent =
+                    `Hi ${name}! It's your first time. Please set a password.`;
+                showView('viewSetPassword');
+                setTimeout(() => document.getElementById('newPassword').focus(), 100);
+            } else if (data.action === 'enter_password') {
+                document.getElementById('welcomeBackTitle').textContent = `Welcome back, ${name}!`;
+                showView('viewEnterPassword');
+                setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+            } else if (data.action === 'denied') {
+                toast(data.message, 'error');
+            }
+        }
+
+        async function setPassword() {
+            const pass = document.getElementById('newPassword').value;
+            if (!pass) { toast('Please enter a password', 'error'); return; }
+
+            const btn = document.getElementById('btnSetPass');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'set_pass',
+                user: currentTeacher, new_pass: pass
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast('Password set successfully!', 'success');
+                setTimeout(() => {
+                    document.getElementById('welcomeBackTitle').textContent = `Welcome, ${currentTeacher}!`;
+                    showView('viewEnterPassword');
+                }, 1000);
+            } else {
+                toast(data.message, 'error');
+            }
+        }
+
+        async function verifyPassword() {
+            const pass = document.getElementById('loginPassword').value;
+            if (!pass) { toast('Please enter your password', 'error'); return; }
+
+            const btn = document.getElementById('btnLogin');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'verify',
+                user: currentTeacher, pass: pass
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast('Login successful!', 'success');
+                document.getElementById('dashboardName').textContent = currentTeacher;
+                setTimeout(() => showView('viewDashboard'), 500);
+            } else {
+                toast(data.message || 'Incorrect password', 'error');
+            }
+        }
+
+        function logout() {
+            currentTeacher = '';
+            document.getElementById('teacherName').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            showView('viewRoleSelect');
+            toast('Logged out successfully', 'info');
+        }
+
+        // ==================== STUDENT LOGIN FLOW ====================
+        async function checkStudentAccess() {
+            const sid = document.getElementById('studentId').value.trim();
+            if (!sid) { toast('Please enter your Student ID', 'error'); return; }
+
+            const btn = document.getElementById('btnCheckStudentAccess');
+            setLoading(btn, true);
+
+            const data = await apiCall({ role: 'student', student_id: sid });
+            setLoading(btn, false);
+
+            if (data.status === 'error') {
+                toast(data.message, 'error');
+                return;
+            }
+
+            currentStudentId = sid;
+            currentStudentName = data.name || '';
+
+            if (data.action === 'set_password') {
+                document.getElementById('studentSetPassMsg').textContent =
+                    `Hi ${currentStudentName}! It's your first time. Please set a password.`;
+                showView('viewStudentSetPassword');
+                setTimeout(() => document.getElementById('studentNewPassword').focus(), 100);
+            } else if (data.action === 'enter_password') {
+                document.getElementById('studentWelcomeBackTitle').textContent = `Welcome back, ${currentStudentName}!`;
+                showView('viewStudentEnterPassword');
+                setTimeout(() => document.getElementById('studentLoginPassword').focus(), 100);
+            } else if (data.action === 'denied') {
+                toast(data.message, 'error');
+            }
+        }
+
+        async function setStudentPassword() {
+            const pass = document.getElementById('studentNewPassword').value;
+            const confirmPass = document.getElementById('studentConfirmPassword').value;
+            if (!pass) { toast('Please enter a password', 'error'); return; }
+            if (pass !== confirmPass) { toast('Passwords do not match', 'error'); return; }
+
+            const btn = document.getElementById('btnStudentSetPass');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'student', action: 'set_pass',
+                student_id: currentStudentId, new_pass: pass
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast('Password set successfully!', 'success');
+                setTimeout(() => {
+                    document.getElementById('studentWelcomeBackTitle').textContent = `Welcome, ${currentStudentName}!`;
+                    showView('viewStudentEnterPassword');
+                }, 1000);
+            } else {
+                toast(data.message, 'error');
+            }
+        }
+
+        async function verifyStudentPassword() {
+            const pass = document.getElementById('studentLoginPassword').value;
+            if (!pass) { toast('Please enter your password', 'error'); return; }
+
+            const btn = document.getElementById('btnStudentLogin');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'student', action: 'verify',
+                student_id: currentStudentId, pass: pass
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast('Login successful!', 'success');
+                currentStudentName = data.name || currentStudentName;
+                document.getElementById('studentDashboardName').textContent = currentStudentName;
+                document.getElementById('studentDashboardId').textContent = currentStudentId;
+                setTimeout(() => showView('viewStudentDashboard'), 500);
+            } else {
+                toast(data.message || 'Incorrect password', 'error');
+            }
+        }
+
+        async function loadStudentSummary() {
+            showView('viewStudentSummary');
+            const container = document.getElementById('summaryContent');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+            const data = await apiCall({
+                role: 'student', action: 'summary',
+                student_id: currentStudentId
+            });
+
+            if (data.status === 'error') {
+                container.innerHTML = `<p style="color:var(--text-muted);text-align:center;">${data.message}</p>`;
+                return;
+            }
+
+            document.getElementById('summaryStudentInfo').textContent = `${data.name} • ID: ${data.student_id}`;
+
+            const total = parseInt(data.total_points) || 0;
+            const max = parseInt(data.max_points) || 0;
+            const entries = parseInt(data.total_entries) || 0;
+            const pct = max > 0 ? Math.round((total / max) * 100) : 0;
+
+            let html = '';
+
+            // Stats cards
+            html += '<div class="stats-grid">';
+            html += `<div class="stat-card">
+                        <div class="stat-value" style="color:var(--accent-green);">${total}</div>
+                        <div class="stat-label">Points Earned</div>
+                     </div>`;
+            html += `<div class="stat-card">
+                        <div class="stat-value" style="color:var(--accent-blue);">${max}</div>
+                        <div class="stat-label">Max Possible</div>
+                     </div>`;
+            html += `<div class="stat-card">
+                        <div class="stat-value" style="color:var(--accent-purple);">${entries}</div>
+                        <div class="stat-label">Total Entries</div>
+                     </div>`;
+            html += '</div>';
+
+            // Progress bar
+            html += '<div class="progress-section">';
+            html += `<div class="progress-header">
+                        <span>Performance</span>
+                        <span class="progress-percent">${pct}%</span>
+                     </div>`;
+            html += `<div class="progress-bar-track">
+                        <div class="progress-bar-fill" style="width:${pct}%"></div>
+                     </div>`;
+            html += '</div>';
+
+            // Recent Activity
+            if (data.recent && data.recent.length > 0) {
+                html += '<h3 style="margin-top:1.5rem;font-size:1rem;margin-bottom:0.75rem;">🔔 Recent Activity</h3>';
+                html += '<div class="activity-feed">';
+                data.recent.forEach(r => {
+                    html += `<div class="activity-item">
+                                <div class="activity-dot"></div>
+                                <div class="activity-content">
+                                    <div class="activity-text">Received <strong style="color:var(--accent-green);">${r.awarded}/${r.max}</strong> in <strong>${r.topic}</strong></div>
+                                    <div class="activity-meta">By ${r.teacher} • ${r.date}</div>
+                                </div>
+                             </div>`;
+                });
+                html += '</div>';
+            } else {
+                html += '<p style="color:var(--text-muted);text-align:center;padding:1rem;margin-top:1rem;">No points received yet.</p>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        async function loadStudentHistory() {
+            showView('viewStudentHistory');
+            const container = document.getElementById('studentHistoryTable');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+            const data = await apiCall({
+                role: 'student', action: 'history',
+                student_id: currentStudentId
+            });
+
+            if (data.status === 'error') {
+                container.innerHTML = `<p style="color:var(--text-muted);text-align:center;">${data.message}</p>`;
+                return;
+            }
+
+            if (!data.records || data.records.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No records yet. Your points will appear here once teachers award them.</p>';
+                return;
+            }
+
+            let html = '<div style="overflow-x:auto;">';
+            html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">';
+            html += '<thead><tr style="border-bottom:1px solid var(--glass-border);color:var(--text-muted);text-align:left;">';
+            html += '<th style="padding:0.75rem 0.5rem;">Topic</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Teacher</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Marks</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Date</th>';
+            html += '</tr></thead><tbody>';
+
+            data.records.forEach(r => {
+                html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">`;
+                html += `<td style="padding:0.6rem 0.5rem;">${r.topic}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;color:var(--text-secondary);">${r.teacher}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;"><span style="color:var(--accent-green);">${r.awarded}</span> / ${r.max}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;color:var(--text-muted);font-size:0.75rem;">${r.date}</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        async function loadStudentLeaderboard() {
+            showView('viewStudentLeaderboard');
+            const container = document.getElementById('studentLeaderboardTable');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></div>';
+
+            const data = await apiCall({
+                role: 'student', action: 'leaderboard'
+            });
+
+            if (data.status === 'error') {
+                container.innerHTML = `<p style="color:var(--text-muted);text-align:center;">${data.message}</p>`;
+                return;
+            }
+
+            if (!data.records || data.records.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No points awarded yet. Leaderboard is empty.</p>';
+                return;
+            }
+
+            let html = '<div style="background:rgba(255, 215, 0, 0.05);border:1px solid rgba(255, 215, 0, 0.2);border-radius:10px;overflow:hidden;">';
+            html += '<table style="width:100%;border-collapse:collapse;font-size:0.95rem;">';
+            html += '<thead style="background:rgba(255, 215, 0, 0.1);"><tr style="border-bottom:1px solid rgba(255, 215, 0, 0.2);color:#FFD700;text-align:left;">';
+            html += '<th style="padding:1rem 0.75rem;">Rank</th>';
+            html += '<th style="padding:1rem 0.75rem;">Student Name</th>';
+            html += '<th style="padding:1rem 0.75rem;">Total Points</th>';
+            html += '</tr></thead><tbody>';
+
+            const medals = ['🥇', '🥈', '🥉'];
+            data.records.forEach((r, index) => {
+                const rankDisplay = index < 3 ? medals[index] : `#${index + 1}`;
+                const isMe = r.name === currentStudentName;
+                const highlight = isMe ? 'background:rgba(59, 130, 246, 0.1);border-left:3px solid var(--accent-blue);' : (index === 0 ? 'background:rgba(255, 215, 0, 0.05);' : '');
+                html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);${highlight}">`;
+                html += `<td style="padding:0.8rem 0.75rem;font-size:1.1rem;">${rankDisplay}</td>`;
+                html += `<td style="padding:0.8rem 0.75rem;font-weight:bold;">${r.name}${isMe ? ' <span style="font-size:0.7rem;color:var(--accent-blue);">(You)</span>' : ''}</td>`;
+                html += `<td style="padding:0.8rem 0.75rem;color:var(--accent-green);font-weight:bold;">${r.total} pts</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        async function changePassword() {
+            const oldPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('changeNewPassword').value;
+            const confirmPass = document.getElementById('changeConfirmPassword').value;
+
+            if (!oldPass || !newPass || !confirmPass) {
+                toast('Please fill in all fields', 'error'); return;
+            }
+            if (newPass !== confirmPass) {
+                toast('New passwords do not match', 'error'); return;
+            }
+            if (newPass === oldPass) {
+                toast('New password must be different from current password', 'error'); return;
+            }
+
+            const btn = document.getElementById('btnChangePassword');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'student', action: 'change_pass',
+                student_id: currentStudentId,
+                old_pass: oldPass, new_pass: newPass
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast(data.message, 'success');
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('changeNewPassword').value = '';
+                document.getElementById('changeConfirmPassword').value = '';
+                setTimeout(() => showView('viewStudentDashboard'), 1500);
+            } else {
+                toast(data.message || 'Error changing password', 'error');
+            }
+        }
+
+        function studentLogout() {
+            currentStudentId = '';
+            currentStudentName = '';
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentLoginPassword').value = '';
+            document.getElementById('studentNewPassword').value = '';
+            document.getElementById('studentConfirmPassword').value = '';
+            showView('viewRoleSelect');
+            toast('Logged out successfully', 'info');
+        }
+
+        // ==================== ASK A QUESTION FLOW ====================
+        function showAskQuestion() {
+            showView('viewSearchStudent');
+            setTimeout(() => document.getElementById('searchStudentName').focus(), 100);
+        }
+
+        async function searchStudent() {
+            const name = document.getElementById('searchStudentName').value.trim();
+            if (!name) { toast('Please enter a student name', 'error'); return; }
+
+            const btn = document.getElementById('btnSearchStudent');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'search_student',
+                s_name: name, t_name: currentTeacher
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'error') {
+                toast(data.message, 'error');
+                return;
+            }
+
+            if (data.action === 'marks_form') {
+                // Single student found — go straight to marks
+                showMarksForm(data.student_id, data.student_name);
+            }
+            else if (data.action === 'select_student') {
+                // Multiple students — show selection
+                const list = document.getElementById('studentList');
+                list.innerHTML = '';
+                data.students.forEach(s => {
+                    list.innerHTML += `
+                        <div class="action-card" onclick="showMarksForm('${s.id}', '${s.name}')">
+                            <div class="action-icon">👤</div>
+                            <div>
+                                <div class="action-text">${s.name}</div>
+                                <div class="action-desc">Father: ${s.father} | Student ID: ${s.id}</div>
+                            </div>
+                            <span class="arrow">→</span>
+                        </div>
+                    `;
+                });
+                showView('viewSelectStudent');
+            }
+        }
+
+        function showMarksForm(studentId, studentName) {
+            document.getElementById('selectedStudentId').value = studentId;
+            document.getElementById('assignMarksInfo').textContent = `Student: ${studentName} (ID: ${studentId})`;
+            document.getElementById('questionDesc').value = '';
+            document.getElementById('maxMarks').value = '';
+            document.getElementById('awardedMarks').value = '';
+            showView('viewAssignMarks');
+            setTimeout(() => document.getElementById('questionDesc').focus(), 100);
+        }
+
+        async function savePoints() {
+            const s_id = document.getElementById('selectedStudentId').value;
+            const desc = document.getElementById('questionDesc').value.trim();
+            const max = document.getElementById('maxMarks').value;
+            const awarded = document.getElementById('awardedMarks').value;
+
+            if (!desc || !max || !awarded) {
+                toast('Please fill in all fields', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnSavePoints');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'finalize_points',
+                s_id: s_id, t_name: currentTeacher,
+                desc: desc, max: max, awarded: awarded
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast(data.message, 'success');
+                setTimeout(() => showView('viewDashboard'), 1500);
+            } else {
+                toast(data.message || 'Error saving points', 'error');
+            }
+        }
+
+        // ==================== HISTORY ====================
+        async function loadHistory() {
+            const container = document.getElementById('historyTable');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></div>';
+            showView('viewHistory');
+
+            const data = await apiCall({
+                role: 'teacher', action: 'history',
+                teacher: currentTeacher
+            });
+
+            if (data.status === 'error') {
+                container.innerHTML = `<p style="color:var(--text-muted);text-align:center;">${data.message}</p>`;
+                return;
+            }
+
+            if (!data.records || data.records.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No records yet. Start awarding points!</p>';
+                return;
+            }
+
+            let html = '<div style="overflow-x:auto;">';
+            html += '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;">';
+            html += '<thead><tr style="border-bottom:1px solid var(--glass-border);color:var(--text-muted);text-align:left;">';
+            html += '<th style="padding:0.75rem 0.5rem;">Student</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Topic</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Marks</th>';
+            html += '<th style="padding:0.75rem 0.5rem;">Date</th>';
+            html += '</tr></thead><tbody>';
+
+            data.records.forEach(r => {
+                html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">`;
+                html += `<td style="padding:0.6rem 0.5rem;">${r.student}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;color:var(--text-secondary);">${r.topic}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;"><span style="color:var(--accent-green);">${r.awarded}</span> / ${r.max}</td>`;
+                html += `<td style="padding:0.6rem 0.5rem;color:var(--text-muted);font-size:0.75rem;">${r.date}</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ==================== LEADERBOARD ====================
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboardTable');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner" style="margin:0 auto;"></div></div>';
+            showView('viewLeaderboard');
+
+            const data = await apiCall({
+                role: 'teacher', action: 'leaderboard'
+            });
+
+            if (data.status === 'error') {
+                container.innerHTML = `<p style="color:var(--text-muted);text-align:center;">${data.message}</p>`;
+                return;
+            }
+
+            if (!data.records || data.records.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No points awarded yet. Leaderboard is empty.</p>';
+                return;
+            }
+
+            let html = '<div style="background:rgba(255, 215, 0, 0.05);border:1px solid rgba(255, 215, 0, 0.2);border-radius:10px;overflow:hidden;">';
+            html += '<table style="width:100%;border-collapse:collapse;font-size:0.95rem;">';
+            html += '<thead style="background:rgba(255, 215, 0, 0.1);"><tr style="border-bottom:1px solid rgba(255, 215, 0, 0.2);color:#FFD700;text-align:left;">';
+            html += '<th style="padding:1rem 0.75rem;">Rank</th>';
+            html += '<th style="padding:1rem 0.75rem;">Student Name</th>';
+            html += '<th style="padding:1rem 0.75rem;">Total Points</th>';
+            html += '</tr></thead><tbody>';
+
+            const medals = ['🥇', '🥈', '🥉'];
+            data.records.forEach((r, index) => {
+                const rankDisplay = index < 3 ? medals[index] : `#${index + 1}`;
+                const highlight = index === 0 ? 'background:rgba(255, 215, 0, 0.05);' : '';
+                html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);${highlight}">`;
+                html += `<td style="padding:0.8rem 0.75rem;font-size:1.1rem;">${rankDisplay}</td>`;
+                html += `<td style="padding:0.8rem 0.75rem;font-weight:bold;">${r.name}</td>`;
+                html += `<td style="padding:0.8rem 0.75rem;color:var(--accent-green);font-weight:bold;">${r.total} pts</td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ==================== EDIT POINTS FLOW ====================
+        function showEditPoints() {
+            showView('viewEditSearch');
+            setTimeout(() => document.getElementById('editSearchName').focus(), 100);
+        }
+
+        async function searchStudentForEdit() {
+            const name = document.getElementById('editSearchName').value.trim();
+            if (!name) { toast('Please enter a student name', 'error'); return; }
+
+            const btn = document.getElementById('btnEditSearch');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'search_for_edit',
+                s_name: name, t_name: currentTeacher
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'error') { toast(data.message, 'error'); return; }
+
+            if (data.action === 'edit_profile') {
+                loadEditProfileFromSearch(data.student_id);
+            }
+            else if (data.action === 'select_student_edit') {
+                const list = document.getElementById('editStudentList');
+                list.innerHTML = '';
+                data.students.forEach(s => {
+                    list.innerHTML += `
+                        <div class="action-card" onclick="loadEditProfileFromSearch('${s.id}')">
+                            <div class="action-icon">👤</div>
+                            <div>
+                                <div class="action-text">${s.name}</div>
+                                <div class="action-desc">Father: ${s.father} | Student ID: ${s.id}</div>
+                            </div>
+                            <span class="arrow">→</span>
+                        </div>
+                    `;
+                });
+                showView('viewSelectStudentEdit');
+            }
+        }
+
+        async function loadEditProfileFromSearch(studentId) {
+            const data = await apiCall({
+                role: 'teacher', action: 'edit_profile',
+                s_id: studentId, t_name: currentTeacher
+            });
+            if (data.status === 'error') { toast(data.message, 'error'); return; }
+            loadEditProfile(data.student_id, data.student_name, data.father_name, data.records);
+        }
+
+        function loadEditProfile(id, name, father, records) {
+            document.getElementById('editStudentId').value = id;
+            document.getElementById('editProfileInfo').textContent = `${name} (ID: ${id}) • Father: ${father}`;
+            document.getElementById('adjustReason').value = '';
+            document.getElementById('adjustValue').value = '';
+
+            const container = document.getElementById('editHistoryTable');
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">No point records yet.</p>';
+            } else {
+                let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:0.5rem;">';
+                html += '<thead><tr style="border-bottom:1px solid var(--glass-border);color:var(--text-muted);text-align:left;">';
+                html += '<th style="padding:0.5rem 0.4rem;">Topic</th><th style="padding:0.5rem 0.4rem;">Marks</th><th style="padding:0.5rem 0.4rem;">Date</th></tr></thead><tbody>';
+                records.forEach(r => {
+                    html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">`;
+                    html += `<td style="padding:0.4rem;">${r.topic}</td>`;
+                    html += `<td style="padding:0.4rem;"><span style="color:var(--accent-green);">${r.awarded}</span>/${r.max}</td>`;
+                    html += `<td style="padding:0.4rem;color:var(--text-muted);font-size:0.7rem;">${r.date}</td></tr>`;
+                });
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            }
+            showView('viewEditProfile');
+        }
+
+        async function applyAdjustment() {
+            const s_id = document.getElementById('editStudentId').value;
+            const reason = document.getElementById('adjustReason').value.trim();
+            const val = document.getElementById('adjustValue').value;
+
+            if (!reason || !val) { toast('Please fill in all fields', 'error'); return; }
+
+            const btn = document.getElementById('btnApplyAdjust');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'apply_adjustment',
+                s_id: s_id, t_name: currentTeacher,
+                desc: reason, adjust_val: val
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast(data.message, 'success');
+                setTimeout(() => showView('viewDashboard'), 1500);
+            } else {
+                toast(data.message || 'Error applying adjustment', 'error');
+            }
+        }
+
+        async function resetStudentPoints() {
+            const s_id = document.getElementById('editStudentId').value;
+            const name = document.getElementById('editProfileInfo').textContent.split('(')[0].trim();
+            
+            if (!confirm(`Are you absolutely sure you want to delete ALL points for ${name}? This cannot be undone.`)) {
+                return;
+            }
+
+            const btn = document.getElementById('btnResetPoints');
+            setLoading(btn, true);
+
+            const data = await apiCall({
+                role: 'teacher', action: 'reset_points',
+                s_id: s_id, t_name: currentTeacher
+            });
+            setLoading(btn, false);
+
+            if (data.status === 'ok') {
+                toast(data.message, 'success');
+                setTimeout(() => showView('viewDashboard'), 1500);
+            } else {
+                toast(data.message || 'Error resetting points', 'error');
+            }
+        }
+
+        // ==================== UTILITIES ====================
+        function setLoading(btn, loading) {
+            if (loading) {
+                btn.dataset.text = btn.textContent;
+                btn.innerHTML = '<div class="spinner"></div> Please wait...';
+                btn.disabled = true;
+            } else {
+                btn.textContent = btn.dataset.text;
+                btn.disabled = false;
+            }
+        }
+
+        function toast(message, type = 'info') {
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `${icons[type] || ''} ${message}`;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.style.animation = 'toastOut 0.3s ease-in forwards';
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
+        }
+
+        // Enter key support on inputs
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            const active = document.querySelector('.view.active');
+            if (!active) return;
+            const id = active.id;
+            if (id === 'viewTeacherName') checkTeacherAccess();
+            else if (id === 'viewSetPassword') setPassword();
+            else if (id === 'viewEnterPassword') verifyPassword();
+            else if (id === 'viewStudent') checkStudentAccess();
+            else if (id === 'viewStudentSetPassword') setStudentPassword();
+            else if (id === 'viewStudentEnterPassword') verifyStudentPassword();
+        });
+    </script>
+</body>
+
+</html>
