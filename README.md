@@ -1,33 +1,30 @@
 # ClassPoints: Student Participation Tracking System
 
 ## 👥 Team Information
-* [cite_start]**Ansh Chauhan** (Team Lead) - University Roll: 2592521 
-* [cite_start]**Garima Joshi** - University Roll: 2592557 
-* [cite_start]**Harshit Farswan** - University Roll: 2592572 
-* [cite_start]**Priyanshu Rawat** - University Roll: 2592718 
+* **Ansh Chauhan** (Team Lead) - University Roll: 2592521
+* **Garima Joshi** - University Roll: 2592557
+* **Harshit Farswan** - University Roll: 2592572
+* **Priyanshu Rawat** - University Roll: 2592718
 
 ## 🎯 Project Motivation
-[cite_start]Manual tracking of student participation often leads to data loss and confusion, especially with students sharing the same name[cite: 8, 9]. [cite_start]ClassPoints provides a lightweight digital platform to record participation instantly and transparently[cite: 11, 14].
+Manual tracking of student participation often leads to data loss and confusion between students with the same name. ClassPoints provides a lightweight digital platform to record participation instantly, ensuring records are safe and organized.
 
 ## 🛠️ Tech Stack
-* [cite_start]**Language:** C (C99) [cite: 27, 55]
-* [cite_start]**Web Interface:** CGI (Common Gateway Interface) [cite: 55, 63]
-* [cite_start]**Database:** MySQL via `mysql.h` library [cite: 27, 66]
-* [cite_start]**Server:** Apache via XAMPP [cite: 56, 69]
+* **Language:** C (C99)
+* **Web Interface:** CGI (Common Gateway Interface)
+* **Database:** MySQL (via `mysql.h` library)
+* **Server:** Apache via XAMPP
 
 ## 🚀 Key Features (Phase 2)
-* [cite_start]**Duplicate Name Resolution:** Students are uniquely identified using a combination of their Name and Father's Name[cite: 39, 49, 88].
-* [cite_start]**Real-time Leaderboard:** Automatically calculates student rankings using SQL `SUM()` and `GROUP BY` functions[cite: 53, 54, 77].
-* [cite_start]**Audit Trail System:** Every point entry is logged with a timestamp in a `points_log` table, ensuring a full history of changes[cite: 29, 30, 78].
-* [cite_start]**Teacher Authentication:** Secure login portal for managing class data[cite: 65, 84].
+* **Duplicate Name Resolution:** Uses a combination of Student Name and Father’s Name to uniquely identify students.
+* **Real-time Leaderboard:** Automatically calculates student rankings using SQL `SUM()` and `GROUP BY` functions.
+* **Audit Trail System:** Instead of overwriting records, every point entry is logged with a timestamp in a `points_log` table for full transparency.
 
 ## 🏗️ System Architecture
-[cite_start]The system follows a client-server architecture[cite: 60]:
-1. [cite_start]**User Interface:** HTML Forms for teacher inputs[cite: 68, 71].
-2. [cite_start]**Application Layer:** C-based CGI programs processing logic[cite: 70, 71].
-3. [cite_start]**Database Layer:** MySQL storing structured student and log records[cite: 71].
-
-
+The system follows a client-server architecture:
+1. **User Interface (HTML Forms):** Where teachers enter participation data.
+2. **Application Layer (C with CGI):** Processes input and handles logical operations.
+3. **Database Layer (MySQL):** Stores student information and historical participation records.
 
 ---
-*Developed as part of the PBL (Project Based Learning) curriculum at Graphic Era Hill University.*
+*Developed as part of the PBL (Project Based Learning) curriculum.*
